@@ -71,6 +71,13 @@ class VOCDataset(Dataset):
             # The weight vector should be a 20-dimensional vector with weight[i] = 0 iff an object of class i has the `difficult` attribute set to 1 in the XML file and 1 otherwise
             # The difficult attribute specifies whether a class is ambiguous and by setting its weight to zero it does not contribute to the loss during training 
             weight_vec = torch.ones(20)
+            
+            for obj in tree.findall("object"):
+#                 print(ET.tostring(obj,encoding="utf-8").decode("utf-8"))
+                name=obj.find("name").text
+                diff=int(obj.find("difficult").text)
+                class_vec[self.INV_CLASS[name]]=1
+                weight_vec[self.INV_CLASS[name]]=1-diff
 
             ######################################################################
             #                            END OF YOUR CODE                        #
@@ -92,7 +99,16 @@ class VOCDataset(Dataset):
         # change and you will have to write the correct value of `flat_dim`
         # in line 46 in simple_cnn.py
         ######################################################################
-        pass
+        trans=[]
+        if self.split=="test":
+            trans.append(transforms.CenterCrop(size=(224,224)))
+        else:
+            trans.append(transforms.RandomHorizontalFlip(p=0.5))
+            trans.append(transforms.RandomRotation(degrees=15))
+            trans.append(transforms.RandomResizedCrop(size=(224,224),scale=(0.08, 1.0), ratio=(0.75, 1.33)))
+                              
+        return trans
+            
         ######################################################################
         #                            END OF YOUR CODE                        #
         ######################################################################
@@ -111,7 +127,7 @@ class VOCDataset(Dataset):
         img = Image.open(fpath)
 
         trans = transforms.Compose([
-            transforms.Resize(self.size),
+            transforms.Resize((self.size,self.size)),
             *self.get_random_augmentations(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.457, 0.407], std=[0.5, 0.5, 0.5]),

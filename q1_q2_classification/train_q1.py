@@ -18,27 +18,31 @@ if __name__ == "__main__":
     # You should experiment and choose the correct hyperparameters
     # You should get a map of around 22 in 5 epochs
     ##################################################################
-    # args = ARGS(
-    #     epochs=10,
-    #     inp_size=64,
-    #     use_cuda=True,
-    #     val_every=70
-    #     lr=# TODO,
-    #     batch_size=#TODO,
-    #     step_size=#TODO,
-    #     gamma=#TODO
-    # )
-    ##################################################################
-    #                          END OF YOUR CODE                      #
-    ##################################################################
+    for lr, batch_size,step_size,gamma in [(0.001, 64, 20, 0.1)]:
 
-    print(args)
+        args = ARGS(
+            epochs=100,
+            inp_size=64,
+            use_cuda=True,
+            val_every=70,
+            lr=lr,
+            batch_size=batch_size,
+            step_size=step_size,
+            gamma=gamma
+        )
+        ##################################################################
+        #                          END OF YOUR CODE                      #
+        ##################################################################
 
-    # initializes the model
-    model = SimpleCNN(num_classes=len(VOCDataset.CLASS_NAMES), inp_size=64, c_dim=3)
-    # initializes Adam optimizer and simple StepLR scheduler
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
-    # trains model using your training code and reports test map
-    test_ap, test_map = trainer.train(args, model, optimizer, scheduler)
-    print('test map:', test_map)
+        print(args)
+
+        # initializes the model
+        model = SimpleCNN(num_classes=len(VOCDataset.CLASS_NAMES), inp_size=64, c_dim=3)
+        # initializes Adam optimizer and simple StepLR scheduler
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
+        # trains model using your training code and reports test map
+        test_ap, test_map = trainer.train(args, model, optimizer, scheduler)
+        print('test map:', test_map)
+        if test_map>=0.22:
+            print("************ ","lr: ",lr,", batch_size: ",batch_size,", step_size: ",step_size,", gamma: ", gamma)

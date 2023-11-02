@@ -54,12 +54,14 @@ def train(args, model, optimizer, scheduler=None, model_name='model'):
             #   - `output`: Computed loss, a single floating point number
             ##################################################################
             loss = 0
+            l=-wgt*(target*torch.log(torch.sigmoid(output)+1e-10)+(1-target)*torch.log(1-torch.sigmoid(output)+1e-10))
+            loss=l.sum(dim=-1).mean()
+                    
             ##################################################################
             #                          END OF YOUR CODE                      #
             ##################################################################
             
-            loss.backward()
-            
+            loss.backward()            
             if cnt % args.log_every == 0:
                 writer.add_scalar("Loss/train", loss.item(), cnt)
                 print('Train Epoch: {} [{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, cnt, 100. * batch_idx / len(train_loader), loss.item()))
