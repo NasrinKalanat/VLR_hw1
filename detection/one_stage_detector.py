@@ -113,12 +113,12 @@ class DetectorBackboneWithFPN(nn.Module):
         fpn_feats["p5"]=out5
         
         x4=self.fpn_params[f"lateral_c4"](backbone_feats["c4"])
-        x4=x4+F.interpolate(out5,scale_factor=2, mode='bilinear', align_corners=True) #?
+        x4=x4+F.interpolate(x5,scale_factor=2, mode='bilinear', align_corners=True) #?
         out4=self.fpn_params[f"output_p4"](x4)
         fpn_feats["p4"]=out4  
         
         x3=self.fpn_params[f"lateral_c3"](backbone_feats["c3"])
-        x3=x3+F.interpolate(out4,scale_factor=2, mode='bilinear', align_corners=True) #?
+        x3=x3+F.interpolate(x4,scale_factor=2, mode='bilinear', align_corners=True) #?
         out3=self.fpn_params[f"output_p3"](x3)
         fpn_feats["p3"]=out3           
         ######################################################################
